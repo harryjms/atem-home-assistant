@@ -47,12 +47,6 @@
       },
       "preview_input": {
         "name": "Preview input (M/E {me})"
-      },
-      "multiview_layout": {
-        "name": "Multiview {mv} layout"
-      },
-      "multiview_window": {
-        "name": "Multiview {mv} window {window}"
       }
     },
     "switch": {
