@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -9,6 +11,8 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from . import AtemConfigEntry
 from .coordinator import AtemConnection
 from .entity import AtemEntity
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
@@ -24,10 +28,19 @@ async def async_setup_entry(
         entities.append(AtemInputSelect(connection, me, bus="program"))
         entities.append(AtemInputSelect(connection, me, bus="preview"))
 
-    for mv in range(connection.multiviewer_count):
-        entities.append(AtemMultiviewLayoutSelect(connection, mv))
-        for window in range(connection.multiview_window_count(mv)):
-            entities.append(AtemMultiviewWindowSelect(connection, mv, window))
+    # Multiview support is best-effort: some models/firmware do not report
+    # multiviewer topology the way PyATEMMax expects. Never let that take down
+    # the core program/preview selects.
+    try:
+        for mv in range(connection.multiviewer_count):
+            entities.append(AtemMultiviewLayoutSelect(connection, mv))
+            for window in range(connection.multiview_window_count(mv)):
+                entities.append(AtemMultiviewWindowSelect(connection, mv, window))
+    except Exception:  # noqa: BLE001 - guard against unexpected switcher state
+        _LOGGER.warning(
+            "Could not set up ATEM multiview selects; skipping them",
+            exc_info=True,
+        )
 
     async_add_entities(entities)
 

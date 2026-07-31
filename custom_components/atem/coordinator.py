@@ -176,7 +176,12 @@ class AtemConnection:
         """Return the number of multiviewers reported by the switcher."""
         # verify: multiviewer count is *not* part of topology; PyATEMMax 1.0b9
         # reports it separately at multiViewer.config.multiViewers (_handle_MvC).
-        return int(self.switcher.multiViewer.config.multiViewers)
+        # Some models/firmware leave this unset (None) even when connected, so
+        # fall back to 0 rather than raising during platform setup.
+        try:
+            return int(self.switcher.multiViewer.config.multiViewers)
+        except (TypeError, ValueError):
+            return 0
 
     def multiview_window_count(self, mv: int) -> int:
         """Return the number of routable windows reported for a multiviewer."""
@@ -186,7 +191,10 @@ class AtemConnection:
         # tops out at 10, which is also the library's multiview window ceiling.
         count = 0
         for window in self.switcher.atem.windows:
-            source = self.switcher.multiViewer.input[mv][window].videoSource
+            try:
+                source = self.switcher.multiViewer.input[mv][window].videoSource
+            except (KeyError, IndexError, AttributeError):
+                continue
             if source.value is not None:
                 count += 1
         return count
