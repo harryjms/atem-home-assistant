@@ -2,11 +2,11 @@ name: Release
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to release, without the leading v (e.g. 0.1.0). Should match manifest.json."
-        required: true
-        default: "0.1.0"
+  push:
+    branches: [main]
+    paths:
+      - custom_components/atem/manifest.json
+      - .github/workflows/release.yml
 
 permissions:
   contents: write
@@ -15,15 +15,15 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the tagged commit
+      - name: Check out the repository
         uses: actions/checkout@v4
 
-      - name: Create the release and tag
+      - name: Create a release for the manifest version if none exists
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ github.event.inputs.version }}
         run: |
           set -euo pipefail
+          VERSION="$(python3 -c "import json; print(json.load(open('custom_components/atem/manifest.json'))['version'])")"
           TAG="v${VERSION}"
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG already exists; nothing to do."
