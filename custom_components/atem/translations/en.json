@@ -1,0 +1,61 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to a Blackmagic ATEM switcher",
+        "description": "Enter the IP address of your ATEM switcher. Home Assistant will connect over the network to confirm it is reachable.",
+        "data": {
+          "host": "Host",
+          "name": "Name"
+        },
+        "data_description": {
+          "host": "The IP address or hostname of the ATEM switcher.",
+          "name": "Optional name for this switcher. Defaults to the model reported by the switcher."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect. Check the IP address and that the switcher is powered on and reachable on the network."
+    },
+    "abort": {
+      "already_configured": "This ATEM switcher is already configured."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "connectivity": {
+        "name": "Connectivity"
+      }
+    },
+    "button": {
+      "cut": {
+        "name": "Cut (M/E {me})"
+      },
+      "auto": {
+        "name": "Auto (M/E {me})"
+      },
+      "ftb": {
+        "name": "Fade to black (M/E {me})"
+      },
+      "macro": {
+        "name": "Macro {name}"
+      }
+    },
+    "select": {
+      "program_input": {
+        "name": "Program input (M/E {me})"
+      },
+      "preview_input": {
+        "name": "Preview input (M/E {me})"
+      }
+    },
+    "switch": {
+      "upstream_keyer": {
+        "name": "Upstream keyer {keyer} on air (M/E {me})"
+      },
+      "downstream_keyer": {
+        "name": "Downstream keyer {dsk} on air"
+      }
+    }
+  }
+}

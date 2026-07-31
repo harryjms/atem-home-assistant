@@ -1,0 +1,14 @@
+{
+  "domain": "atem",
+  "name": "Blackmagic ATEM",
+  "codeowners": ["@harryjms"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/harryjms/vclock-home-assistant",
+  "integration_type": "device",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/harryjms/vclock-home-assistant/issues",
+  "loggers": ["PyATEMMax"],
+  "requirements": ["PyATEMMax==1.0b9"],
+  "version": "0.1.0"
+}
