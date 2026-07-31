@@ -55,7 +55,7 @@ changes.
 
 1. In Home Assistant, open **HACS → Integrations**.
 2. Use the overflow menu (three dots) → **Custom repositories**.
-3. Add `https://github.com/harryjms/vclock-home-assistant` with category
+3. Add `https://github.com/harryjms/atem-home-assistant` with category
    **Integration**.
 4. Install **Blackmagic ATEM** and restart Home Assistant.
 
