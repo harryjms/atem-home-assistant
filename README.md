@@ -1,19 +1,8 @@
-# Home Assistant custom components
+# Blackmagic ATEM — Home Assistant
 
-This repository hosts Home Assistant custom integrations distributed via
-[HACS](https://hacs.xyz/).
-
-Two components are planned/present here:
-
-- **Blackmagic ATEM** (`custom_components/atem/`) — control a Blackmagic Design
-  ATEM video switcher. Documented below and available now.
-- **VClock** (planned) — a separate integration that will live under its own
-  `custom_components/` directory. It is **not** implemented by the ATEM
-  component and nothing here removes or replaces it.
-
----
-
-## Blackmagic ATEM
+A Home Assistant custom integration to control a Blackmagic Design ATEM video
+switcher, distributed via [HACS](https://hacs.xyz/). The component lives under
+`custom_components/atem/`.
 
 Control a Blackmagic Design ATEM video switcher from Home Assistant over the
 local network. The integration uses [PyATEMMax](https://pypi.org/project/PyATEMMax/)

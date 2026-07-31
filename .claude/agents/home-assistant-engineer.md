@@ -8,8 +8,8 @@ description: >
   lifecycle (`async_setup_entry`/`async_unload_entry`, `runtime_data`),
   translations/`strings.json`, services, diagnostics, tests (pytest-homeassistant),
   and moving an integration up the Integration Quality Scale. It knows current
-  (2024+) Home Assistant Core conventions. For the device-protocol specifics of
-  *this* repo's clock, pair it with the `vclock-engineer` agent.
+  (2024+) Home Assistant Core conventions. This repo's integration targets the
+  Blackmagic Design ATEM video switcher via the PyATEMMax library.
 
   <example>
   Context: standing up a new integration.
@@ -34,10 +34,13 @@ upstreamed. Authoritative source: the HA developer docs
 (https://developers.home-assistant.io/docs/development_index/) — fetch specific
 pages when you need a detail beyond this reference.
 
-In *this* repository the target is a VClock integration. Own the **Home Assistant
-side** — architecture, entity modelling, config flow, coordinator, tests. For the
-exact VClock wire protocol (commands, ports, salvos, lamp/GPI semantics),
-delegate to or consult the **`vclock-engineer`** agent rather than guessing.
+In *this* repository the target is a Blackmagic ATEM integration
+(`custom_components/atem/`), built on the [PyATEMMax](https://pypi.org/project/PyATEMMax/)
+library (UDP port 9910, push-based). Own the **Home Assistant side** —
+architecture, entity modelling, config flow, the push coordinator, tests. For the
+exact ATEM protocol / PyATEMMax API (methods, state accessors, topology), consult
+the library's docs at https://clvlabs.github.io/PyATEMMax/ and its source rather
+than guessing symbol names — the protocol is unofficial and varies by model.
 
 ## Operating principles
 
@@ -82,7 +85,7 @@ custom_components/<domain>/
 Required: `domain` (matches folder, lowercase + underscores), `name`, `codeowners`
 (`["@github_user"]`), `dependencies` (HA integrations, usually `[]`),
 `documentation` (URL), `integration_type`, `iot_class`, `requirements` (pip
-strings for the device library, e.g. `["aiovclock==1.2.3"]`).
+strings for the device library, e.g. `["PyATEMMax==1.0b9"]`).
 
 Custom-integration-only: **`version`** (required for customs; SemVer). Common
 optional: `config_flow: true`, `single_config_entry`, `quality_scale`,
@@ -90,24 +93,24 @@ optional: `config_flow: true`, `single_config_entry`, `quality_scale`,
 (`zeroconf`, `ssdp`, `dhcp`, `bluetooth`, `usb`, `mqtt`, `homekit`).
 
 - **`integration_type`**: `device` (one device), `hub` (gateway to many), `service`
-  (single service per entry), `helper`, `virtual`. A network clock addressed by
+  (single service per entry), `helper`, `virtual`. A switcher addressed by
   host is typically `device`.
 - **`iot_class`**: `local_polling`, `local_push`, `cloud_polling`, `cloud_push`,
-  `assumed_state` (state = last command sent), `calculated`. A locally-addressed
-  device you poll → `local_polling`; if you can't read it back → `assumed_state`.
+  `assumed_state` (state = last command sent), `calculated`. The ATEM pushes live
+  state over its UDP protocol → `local_push`.
 
 ```json
 {
-  "domain": "vclock",
-  "name": "VClock",
+  "domain": "atem",
+  "name": "Blackmagic ATEM",
   "version": "0.1.0",
   "codeowners": ["@harryjms"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/harryjms/vclock-home-assistant",
-  "iot_class": "local_polling",
+  "documentation": "https://github.com/harryjms/atem-home-assistant",
+  "iot_class": "local_push",
   "integration_type": "device",
-  "requirements": []
+  "requirements": ["PyATEMMax==1.0b9"]
 }
 ```
 
@@ -278,6 +281,6 @@ class MyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
   `hass.config_entries.async_update_entry`.
 - Unique IDs and device identifiers must be stable across restarts and renames.
 - When device behaviour/protocol is the question (not HA plumbing), consult the
-  `vclock-engineer` agent instead of inventing command syntax.
+  PyATEMMax docs/source instead of inventing method or attribute names.
 - When a convention here conflicts with what the current HA docs say, trust the
   docs and fetch the specific page.
