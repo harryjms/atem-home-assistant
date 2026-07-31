@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, without the leading v (e.g. 0.1.0). Should match manifest.json."
+        required: true
+        default: "0.1.0"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the tagged commit
+        uses: actions/checkout@v4
+
+      - name: Create the release and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          set -euo pipefail
+          TAG="v${VERSION}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; nothing to do."
+            exit 0
+          fi
+          cat > release-notes.md <<'EOF'
+          Blackmagic ATEM integration for Home Assistant.
+
+          Control a Blackmagic Design ATEM video switcher over the local network
+          (PyATEMMax, UDP 9910, push-based). Entities are created from the
+          switcher's reported topology:
+
+          - Program / Preview input selects (per M/E)
+          - Cut, Auto, Fade-to-black buttons (per M/E)
+          - One button per stored macro
+          - Upstream / downstream keyer on-air switches
+          - Connectivity binary sensor
+
+          Note: the ATEM protocol is unofficial; available features and topology
+          vary by switcher model and firmware.
+
+          Install via HACS as a custom repository (category: Integration).
+          EOF
+          gh release create "$TAG" \
+            --target "${{ github.sha }}" \
+            --title "$TAG" \
+            --notes-file release-notes.md
+          echo "Created release $TAG."
