@@ -10,5 +10,5 @@
   "issue_tracker": "https://github.com/harryjms/atem-home-assistant/issues",
   "loggers": ["PyATEMMax"],
   "requirements": ["PyATEMMax==1.0b9"],
-  "version": "0.1.1"
+  "version": "0.1.2"
 }

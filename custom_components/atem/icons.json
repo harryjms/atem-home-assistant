@@ -1,0 +1,48 @@
+{
+  "entity": {
+    "select": {
+      "program_input": {
+        "default": "mdi:broadcast"
+      },
+      "preview_input": {
+        "default": "mdi:eye-outline"
+      }
+    },
+    "button": {
+      "cut": {
+        "default": "mdi:content-cut"
+      },
+      "auto": {
+        "default": "mdi:transition"
+      },
+      "ftb": {
+        "default": "mdi:television-off"
+      },
+      "macro": {
+        "default": "mdi:play-box-multiple"
+      }
+    },
+    "switch": {
+      "upstream_keyer": {
+        "default": "mdi:layers",
+        "state": {
+          "off": "mdi:layers-off"
+        }
+      },
+      "downstream_keyer": {
+        "default": "mdi:layers-triple",
+        "state": {
+          "off": "mdi:layers-off"
+        }
+      }
+    },
+    "binary_sensor": {
+      "connectivity": {
+        "default": "mdi:lan-disconnect",
+        "state": {
+          "on": "mdi:lan-connect"
+        }
+      }
+    }
+  }
+}
