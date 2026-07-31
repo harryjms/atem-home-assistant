@@ -169,6 +169,65 @@ class AtemConnection:
             self.switcher.setPreviewInputVideoSource, me, source_value
         )
 
+    # -- MultiViewers ---------------------------------------------------------
+
+    @property
+    def multiviewer_count(self) -> int:
+        """Return the number of multiviewers reported by the switcher."""
+        # verify: multiviewer count is *not* part of topology; PyATEMMax 1.0b9
+        # reports it separately at multiViewer.config.multiViewers (_handle_MvC).
+        return int(self.switcher.multiViewer.config.multiViewers)
+
+    def multiview_window_count(self, mv: int) -> int:
+        """Return the number of routable windows reported for a multiviewer."""
+        # verify: window count is not reported directly. PyATEMMax populates a
+        # window's videoSource only for windows the switcher advertises (via
+        # MvIn), so we count windows that have a reported source. ATEMWindows
+        # tops out at 10, which is also the library's multiview window ceiling.
+        count = 0
+        for window in self.switcher.atem.windows:
+            source = self.switcher.multiViewer.input[mv][window].videoSource
+            if source.value is not None:
+                count += 1
+        return count
+
+    def multiview_layouts(self) -> list[tuple[str, str]]:
+        """Return (option_value, label) for every multiview layout."""
+        # verify: layout enum is ATEMMultiViewerLayouts, exposed as
+        # switcher.atem.multiViewerLayouts (top/bottom/left/right).
+        return [
+            (layout.name, layout.name.capitalize())
+            for layout in self.switcher.atem.multiViewerLayouts
+        ]
+
+    def multiview_layout(self, mv: int) -> str | None:
+        """Return the current layout name for a multiviewer, if known."""
+        # verify: live layout state is at multiViewer.properties[mv].layout,
+        # an ATEMConstant whose .name matches a multiViewerLayouts member.
+        return self.switcher.multiViewer.properties[mv].layout.name or None
+
+    async def async_set_multiview_layout(self, mv: int, option: str) -> None:
+        """Set the layout for a multiviewer."""
+        # setMultiViewerPropertiesLayout accepts the layout name string or value.
+        await self.hass.async_add_executor_job(
+            self.switcher.setMultiViewerPropertiesLayout, mv, option
+        )
+
+    def multiview_window_source(self, mv: int, window: int) -> int | None:
+        """Return the current video source value for a multiview window."""
+        # verify: live window source is at
+        # multiViewer.input[mv][window].videoSource (an ATEMConstant).
+        source = self.switcher.multiViewer.input[mv][window].videoSource
+        return None if source.value is None else int(source.value)
+
+    async def async_set_multiview_window_source(
+        self, mv: int, window: int, source_value: int
+    ) -> None:
+        """Route a video source to a multiview window."""
+        await self.hass.async_add_executor_job(
+            self.switcher.setMultiViewerInputVideoSource, mv, window, source_value
+        )
+
     # -- Transitions ----------------------------------------------------------
 
     async def async_cut(self, me: int) -> None:

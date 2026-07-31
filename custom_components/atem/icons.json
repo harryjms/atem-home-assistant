@@ -6,6 +6,12 @@
       },
       "preview_input": {
         "default": "mdi:eye-outline"
+      },
+      "multiview_layout": {
+        "default": "mdi:view-grid-plus"
+      },
+      "multiview_window": {
+        "default": "mdi:grid"
       }
     },
     "button": {
